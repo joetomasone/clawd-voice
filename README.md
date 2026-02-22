@@ -103,6 +103,46 @@ tts:
   similarity_boost: 0.8
 ```
 
+#### Changing the Voice
+
+The `voice_id` field determines which ElevenLabs voice is used. To change it:
+
+1. **Browse voices** at [ElevenLabs Voice Library](https://elevenlabs.io/voice-library) — thousands of free community voices plus premium options.
+
+2. **Find a voice you like**, click on it, and copy the **Voice ID** from the URL or voice details page.
+
+3. **Or use the API** to list your available voices:
+   ```bash
+   curl -s "https://api.elevenlabs.io/v1/voices" \
+     -H "xi-api-key: YOUR_ELEVENLABS_KEY" | python3 -m json.tool
+   ```
+   Each voice entry has a `voice_id` and `name` field.
+
+4. **Update `config.yaml`:**
+   ```yaml
+   tts:
+     voice_id: "paste-your-voice-id-here"
+   ```
+
+**Popular built-in voices:**
+
+| Voice | ID | Style |
+|-------|-----|-------|
+| George | `JBFqnCBsd6RMkjVDRZzb` | British male, authoritative (default) |
+| Rachel | `21m00Tcm4TlvDq8ikWAM` | American female, calm |
+| Adam | `pNInz6obpgDQGcFmaJgB` | American male, deep |
+| Bella | `EXAVITQu4vr4xnSDxMaL` | American female, soft |
+| Antoni | `ErXwobaYiN019PkySvjV` | American male, well-rounded |
+| Domi | `AZnzlk1XvdvUeBnXmlld` | American female, strong |
+
+**Voice settings:**
+- `stability` (0.0–1.0): Higher = more consistent, lower = more expressive/variable
+- `similarity_boost` (0.0–1.0): Higher = closer to original voice sample, lower = more creative
+
+**Models:**
+- `eleven_turbo_v2_5` — Fastest, good quality (recommended for voice assistants)
+- `eleven_multilingual_v2` — Best quality, supports 29 languages, slightly slower
+
 ### Audio Settings
 ```yaml
 audio:
