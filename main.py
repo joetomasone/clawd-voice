@@ -56,12 +56,14 @@ def main():
     )
     print("  ✓ VAD recorder ready")
 
+    # STT engine (FluidAudio local or OpenAI Whisper API)
+    stt_config = config['stt']
     transcriber = Transcriber(
-        provider=config['stt']['provider'],
-        api_key=config['stt']['openai_api_key'],
-        model=config['stt']['model'],
+        provider=stt_config['provider'],
+        binary_path=stt_config.get('fluidaudio', {}).get('binary_path', '~/fluid-stt-test/.build/release/FluidSTT'),
+        openai_api_key=stt_config.get('openai', {}).get('api_key', ''),
+        openai_model=stt_config.get('openai', {}).get('model', 'whisper-1'),
     )
-    print("  ✓ Whisper STT ready")
 
     speaker = Speaker(
         api_key=config['tts']['api_key'],

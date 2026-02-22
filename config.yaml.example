@@ -7,9 +7,12 @@ vad:
   max_recording_sec: 30
 
 stt:
-  provider: openai
-  openai_api_key: "YOUR_OPENAI_API_KEY_HERE"
-  model: whisper-1
+  provider: fluidaudio  # fluidaudio (local, free, macOS+AS) | openai (cloud, costs $)
+  fluidaudio:
+    binary_path: ~/fluid-stt-test/.build/release/FluidSTT
+  openai:
+    api_key: "YOUR_OPENAI_API_KEY_HERE"
+    model: whisper-1
 
 gateway:
   url: "http://localhost:18789"

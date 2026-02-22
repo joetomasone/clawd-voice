@@ -3,14 +3,16 @@
 **Local voice assistant for OpenClaw** — Wake word detection, Speech-to-Text, AI processing, and Text-to-Speech, all running locally (except cloud STT/TTS APIs).
 
 ```
-Wake Word → VAD Recording → Whisper STT → OpenClaw Agent → ElevenLabs TTS → Speaker
+Wake Word → VAD Recording → FluidSTT (local) → OpenClaw Agent → ElevenLabs TTS → Speaker
 ```
+
+**Default: FluidAudio STT (free, local, Apple Neural Engine)** — Falls back to OpenAI Whisper API if needed.
 
 ## Features
 
 - 🎤 **Wake word detection** with Picovoice Porcupine (offline, local)
 - 🔇 **Voice Activity Detection (VAD)** using Silero VAD (stops recording on silence)
-- 🗣️ **Speech-to-Text** via OpenAI Whisper API
+- 🗣️ **Speech-to-Text** via FluidAudio/Parakeet (local, free, ANE-powered) or OpenAI Whisper API (cloud fallback)
 - 🤖 **AI processing** through OpenClaw Gateway (local agent orchestration)
 - 🔊 **Text-to-Speech** with ElevenLabs streaming API (high-quality voices)
 - 🖥️ **Cross-platform** audio playback (macOS, Linux, Windows)
@@ -19,9 +21,11 @@ Wake Word → VAD Recording → Whisper STT → OpenClaw Agent → ElevenLabs TT
 
 - **Python 3.10+**
 - **Picovoice account** (free tier) — [Get key here](https://console.picovoice.ai/)
-- **OpenAI API key** (for Whisper STT) — [Get key here](https://platform.openai.com/api-keys)
 - **ElevenLabs API key** (for TTS) — [Get key here](https://elevenlabs.io/)
 - **OpenClaw Gateway** running locally — [Install OpenClaw](https://github.com/openclaw/openclaw)
+
+### Optional (for cloud STT fallback)
+- **OpenAI API key** (for Whisper STT) — [Get key here](https://platform.openai.com/api-keys) — Only needed if FluidSTT unavailable or you prefer cloud STT
 
 ### Optional (for certain playback backends)
 - **Linux:** `aplay` (ALSA, usually pre-installed) or `ffmpeg` for MP3 support
@@ -75,13 +79,49 @@ vad:
   max_recording_sec: 30       # Maximum recording duration
 ```
 
-### Speech-to-Text (Whisper)
+### Speech-to-Text
+
+**Two options: FluidAudio (local, free) or OpenAI Whisper (cloud, costs $)**
+
+#### Option 1: FluidAudio/Parakeet (Recommended — Free, Local, Fast)
+
+```yaml
+stt:
+  provider: fluidaudio
+  fluidaudio:
+    binary_path: ~/fluid-stt-test/.build/release/FluidSTT
+```
+
+**Requirements:**
+- **macOS with Apple Silicon** (M1/M2/M3/M4) — uses Apple Neural Engine for acceleration
+- **One-time model download:** ~600MB (automatic on first run via FluidSTT)
+- **Zero cost** — runs completely locally, no API calls
+
+**Building FluidSTT** (if binary doesn't exist):
+```bash
+git clone https://github.com/FluidAudio/FluidSTT.git
+cd FluidSTT
+swift build -c release
+# Binary will be at .build/release/FluidSTT
+```
+
+The first time you run FluidSTT, it will download the Parakeet TDT v3 model (~600MB) to `~/.fluid/models/`. This is a one-time download.
+
+**Performance:** Typically transcribes faster than real-time (10-30x speed) on Apple Silicon.
+
+#### Option 2: OpenAI Whisper API (Cloud Fallback)
+
 ```yaml
 stt:
   provider: openai
-  openai_api_key: "YOUR_OPENAI_KEY"
-  model: whisper-1
+  openai:
+    api_key: "YOUR_OPENAI_KEY"
+    model: whisper-1
 ```
+
+**Automatic fallback:** If `provider: fluidaudio` is set but the FluidSTT binary is not found, the system automatically falls back to Whisper API (if configured).
+
+**Cost:** ~$0.006 per minute of audio (~$0.36/hour) — see [OpenAI Pricing](https://openai.com/api/pricing/)
 
 ### OpenClaw Gateway
 ```yaml
@@ -200,7 +240,7 @@ audio:
   ✓ Audio backend: afplay
   ✓ Wake word: 'jarvis'
   ✓ VAD recorder ready
-  ✓ Whisper STT ready
+  ✓ FluidSTT ready: /Users/joe/fluid-stt-test/.build/release/FluidSTT
   ✓ ElevenLabs TTS ready
   ✓ Gateway client ready
 
@@ -243,7 +283,7 @@ clawd-voice/
 ├── main.py              # Main loop and orchestration
 ├── wake.py              # Porcupine wake word detector
 ├── recorder.py          # Silero VAD-gated recorder
-├── transcribe.py        # OpenAI Whisper STT
+├── transcribe.py        # STT (FluidAudio local or OpenAI Whisper cloud)
 ├── speak.py             # ElevenLabs TTS
 ├── gateway_client.py    # OpenClaw Gateway client
 ├── audio_player.py      # Cross-platform audio playback
@@ -262,7 +302,8 @@ MIT License — see LICENSE file for details.
 Built with:
 - [Picovoice Porcupine](https://picovoice.ai/) (wake word)
 - [Silero VAD](https://github.com/snakers4/silero-vad) (voice activity detection)
-- [OpenAI Whisper](https://platform.openai.com/docs/guides/speech-to-text) (STT)
+- [FluidAudio/Parakeet](https://github.com/FluidAudio/FluidSTT) (local STT, Apple Neural Engine)
+- [OpenAI Whisper](https://platform.openai.com/docs/guides/speech-to-text) (cloud STT fallback)
 - [ElevenLabs](https://elevenlabs.io/) (TTS)
 - [OpenClaw](https://github.com/openclaw/openclaw) (agent orchestration)
 
