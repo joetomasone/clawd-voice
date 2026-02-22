@@ -1,0 +1,13 @@
+pvporcupine>=4.0
+pvrecorder>=1.2
+pyaudio
+torch
+torchaudio
+openai>=1.0
+requests
+elevenlabs
+numpy
+packaging
+pyyaml
+sounddevice
+soundfile

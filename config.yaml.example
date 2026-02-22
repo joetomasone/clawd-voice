@@ -1,0 +1,40 @@
+wake_word: "jarvis"
+porcupine_access_key: "YOUR_PICOVOICE_ACCESS_KEY_HERE"
+
+vad:
+  threshold: 0.3
+  silence_timeout_sec: 2.0
+  max_recording_sec: 30
+
+stt:
+  provider: openai
+  openai_api_key: "YOUR_OPENAI_API_KEY_HERE"
+  model: whisper-1
+
+gateway:
+  url: "http://localhost:18789"
+  token: "YOUR_OPENCLAW_GATEWAY_TOKEN_HERE"
+  agent: "clawd"
+  session: "agent:clawd:main"
+
+tts:
+  provider: elevenlabs
+  api_key: "YOUR_ELEVENLABS_API_KEY_HERE"
+  voice_id: "JBFqnCBsd6RMkjVDRZzb"  # George (British male)
+  model: "eleven_turbo_v2_5"
+  stability: 0.6
+  similarity_boost: 0.8
+
+audio:
+  input_device: -1  # -1 = default, or specific device index
+  pyaudio_device: -1  # PyAudio device index (for VAD recorder)
+  output_device: null
+  sample_rate: 16000
+  chime_on_wake: true
+  # playback_backend: Cross-platform audio playback
+  #   auto = auto-detect (afplay on macOS, aplay on Linux, sounddevice on Windows)
+  #   afplay = macOS native (WAV, MP3, etc.)
+  #   aplay = Linux ALSA (WAV only, converts others via ffmpeg)
+  #   sounddevice = Python library (universal fallback, any platform)
+  #   ffplay = FFmpeg player (requires ffmpeg installed)
+  playback_backend: auto
